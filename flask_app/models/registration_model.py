@@ -6,6 +6,8 @@ from flask_app.config.connect_to_mysql import connectToMySQL
 #setting a variable for the regex
 #to get it to work you need to import re
 registration = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
+password_regex =re.compile(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$')
+
 
 #class 
 class Registration:
@@ -47,7 +49,6 @@ class Registration:
 # for validating  info that the user inputs
     @staticmethod
     def validate(user):
-        
         is_valid = True
         if len(user["f_name"]) == 0 :
             flash("a name must be given","f_name")
@@ -68,7 +69,7 @@ class Registration:
             flash("email does not follows the right format","email")
             is_valid = False
 #checks if their is a email with the same name
-        elif not Registration.get_by_email({"email":user["email"]}):
+        elif Registration.get_by_email({"email":user["email"]}):
             flash("email is already in use","email")
             is_valid = False
         if len(user["password"]) == 0 :
@@ -77,7 +78,10 @@ class Registration:
         elif len(user["password"]) < 8 :
             flash("password must be at lest 8 characters","password")
             is_valid = False
-        if user["password"] != user["confirm_password"]:
+        elif not password_regex.match(user["password"]):
+            flash("password must be minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character","password")
+            is_valid = False
+        elif user["password"] != user["confirm_password"]:
             flash("password does not match","confirm")
             is_valid = False
         return is_valid

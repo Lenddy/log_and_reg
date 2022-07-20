@@ -26,7 +26,7 @@ def create_user():
         "password": bcrypt.generate_password_hash(request.form["password"])
     }
     session["id"]= Registration.add_one(data)
-    return redirect("/")
+    return redirect("/dashboard")
 
 
 #login form
